@@ -5,6 +5,7 @@ from straight_physics import (
     distance_to_change_speed,
     time_at_constant_speed,
     simulate_straight,
+    find_optimal_brake_point,
     is_straight_feasible,
 )
 
@@ -118,6 +119,23 @@ class TestSimulateStraight:
         expected_t = (50 - 20) / 5 + (50 - 10) / 10   # 6 + 4 = 10
         assert t == APPROX(expected_t)
         assert v_exit == APPROX(10.0)
+
+    def test_respects_max_speed_clamp(self):
+        # Clamping should behave the same as passing a lower target_v.
+        t1, v1 = simulate_straight(20, 50, 10, 500, 5, 10, max_speed=40)
+        t2, v2 = simulate_straight(20, 40, 10, 500, 5, 10)
+        assert t1 == APPROX(t2)
+        assert v1 == APPROX(v2)
+
+
+class TestFindOptimalBrakePoint:
+    def test_reference_case(self):
+        out = find_optimal_brake_point(ENTRY, TARGET, CORNER, LENGTH, ACCEL, BRAKE)
+        assert out["cruise_speed"] == APPROX(50.0)
+        assert out["total_time"] == APPROX(13.4)
+        assert out["exit_speed"] == APPROX(10.0)
+        # brake_dist(50->10 at 10) = 120, so start braking at 500-120 = 380
+        assert out["brake_start_m"] == APPROX(380.0)
 
 
 # ---------------------------------------------------------------------------
