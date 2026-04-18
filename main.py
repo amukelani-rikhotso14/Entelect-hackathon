@@ -118,8 +118,11 @@ def main():
     # Strip debug meta for submission
     clean_strategy = builder.strip_debug_meta(strategy)
 
-    # Output as JSON
-    print(json.dumps(clean_strategy, indent=2))
+    # Output as JSON to file
+    with open('output.txt', 'w') as f:
+        json.dump(clean_strategy, f, indent=2)
+    
+    print("Strategy output saved to output.txt")
 
 
 if __name__ == "__main__":
